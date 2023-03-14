@@ -17,12 +17,12 @@ public class FilmController {
 
     List<Film> filmList = new ArrayList<>();
 
-    @GetMapping("/all")
+    @GetMapping()
     public List<Film> getAll() {
         return filmList;
     }
 
-    @PostMapping("/add")
+    @PostMapping()
     public Film add(@RequestBody Film film) throws ValidationException {
         if (validate(film)) {
             film.setId(filmList.size() + 1);
@@ -35,7 +35,7 @@ public class FilmController {
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping()
     public Film update(@RequestBody Film film) throws NotExistException {
         if (filmList.contains(film)) {
             filmList.remove(film);

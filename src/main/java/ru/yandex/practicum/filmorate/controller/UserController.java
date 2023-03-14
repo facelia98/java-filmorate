@@ -17,12 +17,12 @@ public class UserController {
 
     List<User> userList = new ArrayList<>();
 
-    @GetMapping("/all")
+    @GetMapping()
     public List<User> getAll() {
         return userList;
     }
 
-    @PostMapping("/add")
+    @PostMapping()
     public User add(@RequestBody User user) throws ValidationException {
         if (validate(user)) {
             user.setId(userList.size() + 1);
@@ -35,7 +35,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping()
     public User update(@RequestBody User user) throws NotExistException {
         if (userList.contains(user)) {
             userList.remove(user);
