@@ -49,6 +49,7 @@ public class UserController {
     }
 
     protected boolean validate(User user) {
+        if (user.getName() == null) user.setName(user.getLogin());
         return (!user.getEmail().equals(""))
                 && (!user.getLogin().equals(""))
                 && (!user.getLogin().contains(" "))
