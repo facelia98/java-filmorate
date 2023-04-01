@@ -8,25 +8,27 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    List<User> userList = new ArrayList<>();
+    private final HashMap<Integer, User> userList = new HashMap<>();
 
     @GetMapping()
     public List<User> getAll() {
-        return userList;
+        return new ArrayList<>(userList.values());
     }
 
     @PostMapping()
-    public User add(@RequestBody User user) throws ValidationException {
+    public User add(@RequestBody User user) {
         if (validate(user)) {
             user.setId(userList.size() + 1);
-            userList.add(user);
+            userList.put(user.getId(), user);
             log.info("Получен POST-запрос на добавление пользователя:", user);
             return user;
         } else {
@@ -36,10 +38,10 @@ public class UserController {
     }
 
     @PutMapping()
-    public User update(@RequestBody User user) throws NotExistException {
-        if (userList.contains(user)) {
-            userList.remove(user);
-            userList.add(user);
+    public User update(@RequestBody User user) {
+        if (userList.containsKey(user.getId())) {
+            userList.remove(user.getId());
+            userList.put(user.getId(), user);
             log.info("Получен POST-запрос на обновление данных пользователя:", user);
             return user;
         } else {
@@ -50,11 +52,11 @@ public class UserController {
 
     protected boolean validate(User user) {
         if (user.getName() == null) user.setName(user.getLogin());
-        return (!user.getEmail().equals(""))
+        return (user.getLogin() != null)
+                && (user.getEmail() != null)
+                && (!user.getEmail().equals(""))
                 && (!user.getLogin().equals(""))
                 && (!user.getLogin().contains(" "))
-                && (user.getLogin() != null)
-                && (user.getEmail() != null)
                 && (!user.getEmail().contains(" "))
                 && (user.getEmail().contains("@"))
                 && (!user.getBirthday().isAfter(LocalDate.now()));

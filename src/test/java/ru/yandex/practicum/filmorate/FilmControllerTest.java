@@ -30,6 +30,25 @@ class FilmControllerTest extends FilmController {
     }
 
     @Test
+    void validateFalseNullDescription() {
+        film.setId(0);
+        film.setName("Название фильма");
+        film.setReleaseDate(LocalDate.now());
+        film.setDuration(100L);
+        Assertions.assertFalse(validate(film));
+    }
+
+    @Test
+    void validateFalseBlankName() {
+        film.setId(0);
+        film.setName("     ");
+        film.setReleaseDate(LocalDate.now());
+        film.setDescription("Описание");
+        film.setDuration(100L);
+        Assertions.assertFalse(validate(film));
+    }
+
+    @Test
     void validateFalseBadDuration() {
         film.setId(0);
         film.setName("Название фильма");
@@ -54,6 +73,15 @@ class FilmControllerTest extends FilmController {
         film.setId(0);
         film.setName("");
         film.setReleaseDate(LocalDate.now());
+        film.setDescription("Описание");
+        film.setDuration(100L);
+        Assertions.assertFalse(validate(film));
+    }
+
+    @Test
+    void validateFalseNullReleaseDate() {
+        film.setId(0);
+        film.setName("Название фильма");
         film.setDescription("Описание");
         film.setDuration(100L);
         Assertions.assertFalse(validate(film));
