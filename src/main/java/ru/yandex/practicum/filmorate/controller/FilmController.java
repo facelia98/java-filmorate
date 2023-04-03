@@ -38,7 +38,6 @@ public class FilmController {
     @PutMapping()
     public Film update(@RequestBody Film film) {
         if (filmList.containsKey(film.getId())) {
-            filmList.remove(film.getId());
             filmList.put(film.getId(), film);
             log.info("Получен POST-запрос на обновление данных фильма:", film);
             return film;

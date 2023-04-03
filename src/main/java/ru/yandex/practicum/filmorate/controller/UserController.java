@@ -39,22 +39,21 @@ public class UserController {
     @PutMapping()
     public User update(@RequestBody User user) {
         if (userList.containsKey(user.getId())) {
-            userList.remove(user.getId());
             userList.put(user.getId(), user);
             log.info("Получен POST-запрос на обновление данных пользователя:", user);
             return user;
-        } else {
-            log.error("Полученный POST-запрос некорректен (пользователь не существует):", user);
-            throw new NotExistException("Пользователь не существует!");
         }
+        log.error("Полученный POST-запрос некорректен (пользователь не существует):", user);
+        throw new NotExistException("Пользователь не существует!");
+
     }
 
     protected boolean validate(User user) {
-        if (user.getName() == null) user.setName(user.getLogin());
+        if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
         return (user.getLogin() != null)
                 && (user.getEmail() != null)
-                && (!user.getEmail().equals(""))
-                && (!user.getLogin().equals(""))
+                && (!user.getEmail().isBlank())
+                && (!user.getLogin().isBlank())
                 && (!user.getLogin().contains(" "))
                 && (!user.getEmail().contains(" "))
                 && (user.getEmail().contains("@"))
