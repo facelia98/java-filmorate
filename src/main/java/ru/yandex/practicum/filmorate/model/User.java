@@ -8,12 +8,12 @@ import java.util.Set;
 
 @Data
 public class User {
+    private final Set<Integer> friends = new HashSet<>();
     int id;
     String email;
     String login;
     String name;
     LocalDate birthday;
-    private final Set<Integer> friends = new HashSet<>();
 
     public void addFriend(int id) {
         friends.add(id);

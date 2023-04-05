@@ -31,6 +31,7 @@ public class UserService {
     public List<User> getUsersFriends(int id) {
         return userStorage.getUsersFriends(id);
     }
+
     public boolean addFriend(int userId1, int userId2) {
         return userStorage.addFriend(userId1, userId2);
     }
