@@ -5,14 +5,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class FilmControllerTest extends FilmController {
-
+class FilmServiceTest extends FilmService {
     Film film;
+
+    public FilmServiceTest() {
+        super(new InMemoryFilmStorage());
+    }
 
     @BeforeEach
     void beforeEach() {
