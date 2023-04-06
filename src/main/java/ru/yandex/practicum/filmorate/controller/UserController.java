@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ExceptionHandlers;
-import ru.yandex.practicum.filmorate.exceptions.NotExistException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -13,9 +11,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Slf4j
-public class UserController extends ExceptionHandlers {
+public class UserController {
 
-    UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -39,9 +37,6 @@ public class UserController extends ExceptionHandlers {
 
     @GetMapping("/{userId}")
     public User findById(@PathVariable int userId) {
-        if (userService.findById(userId) == null) {
-            throw new NotExistException(String.format("Пользователь с id=%s не найден", userId));
-        }
         return userService.findById(userId);
     }
 
@@ -52,16 +47,12 @@ public class UserController extends ExceptionHandlers {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable int id, @PathVariable int friendId) {
-        if (!userService.addFriend(id, friendId)) {
-            throw new NotExistException("id заданы некорректно!");
-        }
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
-        if (!userService.deleteFriend(id, friendId)) {
-            throw new NotExistException("id заданы некорректно!");
-        }
+        userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")

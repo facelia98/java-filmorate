@@ -21,26 +21,56 @@ public class UserService {
     }
 
     public List<User> getAll() {
+        log.info("Получен GET-запрос всех пользователей");
         return userStorage.getAll();
     }
 
     public List<User> getCommonFriends(int userId1, int userId2) {
-        return userStorage.getCommonFriends(userId1, userId2);
+        if (userStorage.findById(userId1) != null && userStorage.findById(userId2) != null) {
+            log.info("Получен GET-запрос общих друзей",
+                    String.format("[id1=%s, id2=%s]", userId1, userId2));
+            return userStorage.getCommonFriends(userId1, userId2);
+        }
+        log.error("Получен GET-запрос общих друзей: некорректный id",
+                String.format("[id1=%s, id2=%s]", userId1, userId2));
+        throw new NotExistException("id заданы некорректно!");
     }
 
     public List<User> getUsersFriends(int id) {
-        return userStorage.getUsersFriends(id);
+        if (userStorage.findById(id) != null) {
+            log.info("Получен GET-запрос на список друзей пользователя по id", id);
+            return userStorage.getUsersFriends(id);
+        }
+        log.error("Получен GET-запрос на список друзей пользователя по некорректному id", id);
+        throw new NotExistException(String.format("Пользователь с id=%s не найден", id));
     }
 
-    public boolean addFriend(int userId1, int userId2) {
-        return userStorage.addFriend(userId1, userId2);
+    public void addFriend(int userId1, int userId2) {
+        if (!userStorage.addFriend(userId1, userId2)) {
+            log.error("Получен PUT-запрос на добавление друга: некорректный id",
+                    String.format("[id1=%s, id2=%s]", userId1, userId2));
+            throw new NotExistException("id заданы некорректно!");
+        }
+        log.info("Получен PUT-запрос на добавление друга",
+                String.format("[id1=%s, id2=%s]", userId1, userId2));
     }
 
-    public boolean deleteFriend(int userId1, int userId2) {
-        return userStorage.deleteFriend(userId1, userId2);
+    public void deleteFriend(int userId1, int userId2) {
+        if (!userStorage.deleteFriend(userId1, userId2)) {
+            log.error("Получен DELETE-запрос на удаление друга: некорректный id",
+                    String.format("[id1=%s, id2=%s]", userId1, userId2));
+            throw new NotExistException("id заданы некорректно!");
+        }
+        log.info("Получен DELETE-запрос на удаление друга",
+                String.format("[id1=%s, id2=%s]", userId1, userId2));
     }
 
     public User findById(int userId) {
+        if (userStorage.findById(userId) == null) {
+            log.error("Получен GET-запрос на поиск пользователя по некорректному id", userId);
+            throw new NotExistException(String.format("Пользователь с id=%s не найден", userId));
+        }
+        log.info("Получен GET-запрос на поиск пользователя по id", userId);
         return userStorage.findById(userId);
     }
 

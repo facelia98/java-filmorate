@@ -23,14 +23,25 @@ public class FilmService {
     }
 
     public List<Film> getAll() {
+        log.info("Получен GET-запрос всех фильмов");
         return filmStorage.getAll();
     }
 
     public List<Film> getTop(int count) {
-        return filmStorage.getTop(count);
+        if (count < 0) {
+            log.error("Передано отрицательное значение count в GET-запросе на ТОП фильмов", count);
+            throw new ValidationException("Передано значение меньше 0");
+        }
+        log.info("Получен GET-запрос ТОП фильмов", count);
+        return filmStorage.getTop(Integer.parseInt(String.valueOf(count)));
     }
 
     public Film findById(int filmId) {
+        if (filmStorage.findById(filmId) == null) {
+            log.error("Получен GET-запрос на поиск фильма по некорректному id", filmId);
+            throw new NotExistException(String.format("Фильм с id=%s не найден!", filmId));
+        }
+        log.info("Получен GET-запрос на поиск фильма по id", filmId);
         return filmStorage.findById(filmId);
     }
 
@@ -52,13 +63,24 @@ public class FilmService {
         throw new NotExistException("Фильм не существует!");
     }
 
-
-    public boolean addLike(int filmId, int userId) {
-        return filmStorage.addLike(filmId, userId);
+    public void addLike(int filmId, int userId) {
+        if (!filmStorage.addLike(filmId, userId)) {
+            log.error("Получен PUT-запрос на добавление лайка: некорректный id",
+                    String.format("[filmId=%s, userId=%s]", filmId, userId));
+            throw new NotExistException("Указаны неверные id!");
+        }
+        log.error("Получен PUT-запрос на добавление лайка",
+                String.format("[filmId=%s, userId=%s]", filmId, userId));
     }
 
-    public boolean deleteLike(int filmId, int userId) {
-        return filmStorage.deleteLike(filmId, userId);
+    public void deleteLike(int filmId, int userId) {
+        if (!filmStorage.deleteLike(filmId, userId)) {
+            log.error("Получен DELETE-запрос на удаление лайка: некорректный id",
+                    String.format("[filmId=%s, userId=%s]", filmId, userId));
+            throw new NotExistException("Указаны неверные id!");
+        }
+        log.error("Получен DELETE-запрос на удаление лайка",
+                String.format("[filmId=%s, userId=%s]", filmId, userId));
     }
 
     protected boolean validate(Film film) {
