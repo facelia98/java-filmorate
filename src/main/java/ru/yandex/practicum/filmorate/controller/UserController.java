@@ -1,14 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotExistException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -16,47 +13,50 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    private final HashMap<Integer, User> userList = new HashMap<>();
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping()
     public List<User> getAll() {
-        return new ArrayList<>(userList.values());
+        return userService.getAll();
     }
 
     @PostMapping()
     public User add(@RequestBody User user) {
-        if (validate(user)) {
-            user.setId(userList.size() + 1);
-            userList.put(user.getId(), user);
-            log.info("Получен POST-запрос на добавление пользователя:", user);
-            return user;
-        } else {
-            log.error("Полученный POST-запрос некорректен (данные не прошли валидацию):", user);
-            throw new ValidationException("Данные пользователя некорректны!");
-        }
+        return userService.add(user);
     }
 
     @PutMapping()
     public User update(@RequestBody User user) {
-        if (userList.containsKey(user.getId())) {
-            userList.put(user.getId(), user);
-            log.info("Получен POST-запрос на обновление данных пользователя:", user);
-            return user;
-        }
-        log.error("Полученный POST-запрос некорректен (пользователь не существует):", user);
-        throw new NotExistException("Пользователь не существует!");
-
+        return userService.update(user);
     }
 
-    protected boolean validate(User user) {
-        if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
-        return (user.getLogin() != null)
-                && (user.getEmail() != null)
-                && (!user.getEmail().isBlank())
-                && (!user.getLogin().isBlank())
-                && (!user.getLogin().contains(" "))
-                && (!user.getEmail().contains(" "))
-                && (user.getEmail().contains("@"))
-                && (!user.getBirthday().isAfter(LocalDate.now()));
+    @GetMapping("/{userId}")
+    public User findById(@PathVariable int userId) {
+        return userService.findById(userId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getUsersFriends(@PathVariable int id) {
+        return userService.getUsersFriends(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
