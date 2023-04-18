@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotExistException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -18,7 +19,7 @@ public class FilmService {
     FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(@Qualifier("dbSFilm") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
@@ -57,7 +58,7 @@ public class FilmService {
     public Film update(Film film) {
         if (filmStorage.update(film)) {
             log.info("Получен POST-запрос на обновление данных фильма:", film);
-            return film;
+            return findById(film.getId());
         }
         log.error("Полученный POST-запрос некорректен (фильм не существует):", film);
         throw new NotExistException("Фильм не существует!");
