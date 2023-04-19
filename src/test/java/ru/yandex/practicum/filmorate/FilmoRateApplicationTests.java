@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,24 +26,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Sql(scripts = "classpath:data.sql")
 class FilmoRateApplicationTests {
+    static Film film1;
+    static Film film2;
+    static User user1;
+    static User user2;
     private final UserDbStorage userStorage;
     private final FilmDbStorage filmStorage;
 
-    @Test
-    void getAllFilmsTest() {
-        Film film1 = new Film();
+    @BeforeAll
+    static void beforeAll() {
+        film1 = new Film();
         film1.setName("Название фильма");
         film1.setMpa(new Mpa(2));
         film1.setReleaseDate(LocalDate.now());
         film1.setDescription("Описание");
         film1.setDuration(100L);
-        filmStorage.add(film1);
-        Film film2 = new Film();
+        film2 = new Film();
         film2.setName("Название фильма2");
         film2.setMpa(new Mpa(1));
         film2.setReleaseDate(LocalDate.now().minusYears(2));
         film2.setDescription("Описание");
         film2.setDuration(50L);
+        user1 = new User();
+        user1.setName("Имя пользователя");
+        user1.setLogin("login");
+        user1.setEmail("login@yandex.ru");
+        user1.setBirthday(LocalDate.now().minusYears(10L));
+        user2 = new User();
+        user2.setName("Имя пользователя2");
+        user2.setLogin("login2");
+        user2.setEmail("login2@yandex.ru");
+        user2.setBirthday(LocalDate.now().minusYears(20L));
+
+    }
+
+    @Test
+    void getAllFilmsTest() {
+        filmStorage.add(film1);
         filmStorage.add(film2);
         Collection<Film> films = filmStorage.getAll();
 
@@ -51,50 +71,22 @@ class FilmoRateApplicationTests {
 
     @Test
     void createFilm_CorrectIdTest() {
-        Film film1 = new Film();
-        film1.setName("Название фильма");
-        film1.setMpa(new Mpa(1));
-        film1.setReleaseDate(LocalDate.now());
-        film1.setDescription("Описание");
-        film1.setDuration(100L);
         filmStorage.add(film1);
         Film film = filmStorage.findById(1);
-
         assertEquals(film.getId(), 1);
     }
 
     @Test
     public void getAllUsersTest() {
-        User user1 = new User();
-        user1.setName("Имя пользователя");
-        user1.setLogin("login");
-        user1.setEmail("login@yandex.ru");
-        user1.setBirthday(LocalDate.now().minusYears(10L));
         userStorage.add(user1);
-        User user2 = new User();
-        user2.setName("Имя пользователя2");
-        user2.setLogin("login2");
-        user2.setEmail("login2@yandex.ru");
-        user2.setBirthday(LocalDate.now().minusYears(20L));
         userStorage.add(user2);
         Collection<User> users = userStorage.getAll();
-
         assertThat(users).hasSize(2);
     }
 
     @Test
     public void makeFriendsTest() {
-        User user1 = new User();
-        user1.setName("Имя пользователя");
-        user1.setLogin("login");
-        user1.setEmail("login@yandex.ru");
-        user1.setBirthday(LocalDate.now().minusYears(10L));
         userStorage.add(user1);
-        User user2 = new User();
-        user2.setName("Имя пользователя2");
-        user2.setLogin("login2");
-        user2.setEmail("login2@yandex.ru");
-        user2.setBirthday(LocalDate.now().minusYears(20L));
         userStorage.add(user2);
         userStorage.addFriend(1, 2);
         List<User> u1Friends = userStorage.getUsersFriends(1);
@@ -105,25 +97,8 @@ class FilmoRateApplicationTests {
 
     @Test
     public void makeLike() {
-        Film film1 = new Film();
-        film1.setName("Название фильма");
-        film1.setReleaseDate(LocalDate.now());
-        film1.setMpa(Mpa.of(1, "G"));
-        film1.setDescription("Описание");
-        film1.setDuration(100L);
         filmStorage.add(film1);
-        Film film2 = new Film();
-        film2.setName("Название фильма2");
-        film2.setMpa(Mpa.of(1, "G"));
-        film2.setReleaseDate(LocalDate.now().minusYears(2));
-        film2.setDescription("Описание");
-        film2.setDuration(50L);
         filmStorage.add(film2);
-        User user1 = new User();
-        user1.setName("Имя пользователя");
-        user1.setLogin("login");
-        user1.setEmail("login@yandex.ru");
-        user1.setBirthday(LocalDate.now().minusYears(10L));
         userStorage.add(user1);
         assertTrue(filmStorage.addLike(1, 1));
     }
